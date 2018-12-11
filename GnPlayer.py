@@ -1,15 +1,20 @@
-import os
 import sys
+import threading
 import Watch
-import Sync
 import Constants
 import Util
-import threading
+import os
+import Sync
+import Socket
 
 constants = Constants.Constants()
 watch = Watch.Watch()
 util = Util.Util()
 playerId = 0
+
+Socket.start()
+sys.exit()
+
 
 #Oculta o cursor
 util.hideCursor()
@@ -39,4 +44,3 @@ if int(playerId) > 0:
 
     #Abre e monitora a execução do player
     threading.Thread(target=watch.start).start()
-    sys.exit()
