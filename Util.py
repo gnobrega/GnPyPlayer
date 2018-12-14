@@ -16,9 +16,12 @@ class Util:
         http = urllib3.PoolManager();
         try:
             response = http.request('GET', url);
-            objJson = json.loads(response.data);
-        except:
+			responseStr = response.data.decode('utf-8')
+			print(responseStr)
+            objJson = json.loads(responseStr);
+        except Exception as error:
             print("Falha na conexão");
+			print(error)
             #Tenta obter o id local
             playerId = util.getPreferences("id_player");
             objJson['id'] = playerId;
