@@ -12,9 +12,8 @@ watch = Watch.Watch()
 util = Util.Util()
 playerId = 0
 
-Socket.start()
-sys.exit()
-
+#Inicia o socket
+threading.Thread(target=Socket.start).start()
 
 #Oculta o cursor
 util.hideCursor()
@@ -39,7 +38,7 @@ if int(playerId) > 0:
     sync.syncJsPlayer();
     
     #Sincroniza o conteúdo
-    thrSync = threading.Thread(target=sync.syncContent, args=(playerId))
+    thrSync = threading.Thread(target=sync.syncContent, args=(playerId,))
     thrSync.start();
 
     #Abre e monitora a execução do player

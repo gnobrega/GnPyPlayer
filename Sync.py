@@ -41,6 +41,7 @@ class Sync:
         print("Diretórios de conteúdo criados");
 
         while True:
+            print("#################### Iniciando sincronia de midias #######################")
 
             #Atualiza o arquivo de dados json
             url = constants.SERVER_API_DATA + playerId;
@@ -112,20 +113,60 @@ class Sync:
     #Executa a sincronia
     def sync(self, host, user, password, src, dst):
         import os;
-        
+
         if src[-1:] == "/":
+            print("Sincronizando diretório: " + dst)
             command = 'sh ./sync.sh ';
             command += host + ' ' + user + ' ' + password + ' ';
             command += '"'+src+'" "'+dst+'"';
             os.system(command);
         else:
-            idx = src.rfind("/")+1;
-            file = src[idx:];
-            src = src[:idx];
-            idx = dst.rfind("/")+1;
-            dst = dst[:idx];            
-            
-            command = 'sh ./sync-file.sh ';
-            command += host + ' ' + user + ' ' + password + ' ';
-            command += '"'+src+'" "'+dst+'" "'+file+'"';
-            os.system(command);
+            self.syncFile(host, user, password, src, dst)
+
+    # Executa a sincronia de um arquivo
+    def syncFile(self, host, user, password, src, dst):
+        from ftplib import FTP
+        import os.path
+
+        idx = src.rfind("/")+1
+        fileName = src[idx:]
+        idx = idx - 1
+        remoteFolder = src[:idx]
+        idx = dst.rfind("/");
+        localFolder = dst[:idx];
+
+        # Cria o diretório se não existir
+        os.makedirs(localFolder, mode=0o777, exist_ok=True);
+
+        # Estabelece a conexão
+        session = FTP(host, user, password)
+
+        # Seleciona o diretório
+        if remoteFolder in session.nlst():
+            session.cwd(remoteFolder)
+
+            # Verifica se o arquivo existe no diretório
+            if fileName in session.nlst():
+
+                # Checa o arquivo
+                download = True
+                if os.path.isfile(dst):
+                    localFileSize = os.path.getsize(dst)
+                    session.sendcmd("TYPE i")
+                    remoteFileSize = session.size(fileName)
+                    if localFileSize == remoteFileSize:
+                        download = False
+
+                # Executa o download
+                if download:
+                    print("Realizando o download do arquivo: " + dst)
+                    # session.cwd(remoteFolder)
+                    session.retrbinary("RETR " + fileName, open(dst, 'wb').write)
+                else:
+                    print("Arquivo checado: " + dst)
+
+            else:
+                print("Arquivo não encontrado: " + remoteFolder + "/" + fileName)
+                if os.path.isfile(dst):
+                    print("Removendo arquivo local: " + dst)
+                    os.remove(dst)
