@@ -12,6 +12,7 @@ watch = Watch.Watch()
 util = Util.Util()
 playerId = 0
 
+
 #Inicia o socket
 threading.Thread(target=Socket.start).start()
 
@@ -33,6 +34,9 @@ if int(playerId) > 0:
     #Registra o id do player
     util.setPreferences('id_player', playerId)
 
+    #Envia os pings para o servidor
+    threading.Thread(target=util.pingServer, args=(playerId,)).start()
+
     #Sincroniza o JsPlayer
     sync = Sync.Sync();
     sync.syncJsPlayer();
@@ -43,3 +47,6 @@ if int(playerId) > 0:
 
     #Abre e monitora a execução do player
     threading.Thread(target=watch.start).start()
+
+    # Realiza a captura de tela e o envio ao servidor
+    threading.Thread(target=util.sendScreenshot, args=(playerId,)).start()

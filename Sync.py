@@ -32,6 +32,7 @@ class Sync:
         import ast;
         import shutil;
         import time;
+        import threading
         from pathlib import Path;
         constants = Constants.Constants();
         
@@ -41,7 +42,8 @@ class Sync:
         print("Diretórios de conteúdo criados");
 
         while True:
-            print("#################### Iniciando sincronia de midias #######################")
+            print("Iniciando sincronia de midias")
+            arrAccountsRunning = []
 
             #Atualiza o arquivo de dados json
             url = constants.SERVER_API_DATA + playerId;
@@ -57,7 +59,7 @@ class Sync:
                 objFile = open(fileData, 'w');
                 respData = str(response.data);
                 jsonContent = respData[2:-1];
-                jsonContent = jsonContent.replace("\\\\", "");
+                jsonContent = jsonContent.replace("\\\\", "\\");
                 objFile.write(jsonContent);
                 objFile.close();
                 print("Arquivo de dados atualizado");
@@ -71,6 +73,7 @@ class Sync:
                 objFile.close();
                 if dataStr != "":
                     dataJson = json.loads(dataStr);
+
                     #Campanhas
                     if "campanhas" in dataJson:
                         for campanha in dataJson['campanhas']:
@@ -107,6 +110,19 @@ class Sync:
                                         os.remove(realPath);
                                     else:
                                         shutil.rmtree(realPath);
+
+                    #Sincroniza os pares de pastas
+                    if "contas" in dataJson:
+                        contas = dataJson['contas']
+                        for conta in contas:
+                            contaId = conta['id']
+                            if contaId not in arrAccountsRunning:
+                                arrAccountsRunning.append(contaId)
+                                # Sincronia o par de pastas em thread
+                                thrSync = threading.Thread(target=self.syncFolderPair,
+                                                           args=(conta,))
+                                thrSync.start();
+
             #Aguarda por 5min
             time.sleep(300);
                     
@@ -122,6 +138,37 @@ class Sync:
             os.system(command);
         else:
             self.syncFile(host, user, password, src, dst)
+
+    # Sincroniza um par de pastas
+    def syncFolderPair(self, conta):
+        import os
+        import Constants
+        import time
+        constants = Constants.Constants();
+
+        intervalo = int(conta["intervalo"])
+        intervalo = intervalo * 60
+        nome = conta["nome"]
+        host = conta["host"]
+        usuario = conta["usuario"]
+        senha = conta["senha"]
+        origem = conta["origem"]
+        destino = conta["destino"]
+        destino = destino.replace("C:\\3MIDIA\\", constants.PATH_CLIENT_CONTENT)
+        destino = destino.replace("\\", "/")
+
+        #Ignora em caso de não preenchimento
+        if (origem == "") or (destino == ""):
+            return;
+
+        #Cria os diretorios
+        os.makedirs(destino, mode=0o777, exist_ok=True);
+
+        while True:
+            self.sync(host, usuario, senha, origem, destino)
+
+            #Aguarda até a próxima sincronia
+            time.sleep(300);
 
     # Executa a sincronia de um arquivo
     def syncFile(self, host, user, password, src, dst):

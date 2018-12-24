@@ -1,0 +1,1 @@
+chromium-browser --load-and-launch-app=/home/gnobrega/Projects/GnPyPlayer/chrome-ext

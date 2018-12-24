@@ -16,12 +16,9 @@ class Util:
         http = urllib3.PoolManager();
         try:
             response = http.request('GET', url);
-			responseStr = response.data.decode('utf-8')
-			print(responseStr)
-            objJson = json.loads(responseStr);
-        except Exception as error:
+            objJson = json.loads(response.data);
+        except:
             print("Falha na conexão");
-			print(error)
             #Tenta obter o id local
             playerId = util.getPreferences("id_player");
             objJson['id'] = playerId;
@@ -56,7 +53,8 @@ class Util:
             fileContent = "{}";
 
         #Sobrescreve o atributo
-        objJson = json.loads(fileContent.replace("'", '"'));
+        fileContent = fileContent.replace("'", '"')
+        objJson = json.loads(fileContent);
         objFile = open(filePreferences, 'w');
         objJson[key] = value;
         objFile.write(str(objJson));
@@ -81,7 +79,7 @@ class Util:
                 objJson = json.loads(fileContent.replace("'", '"'));
                 if key in objJson:
                     return objJson[key];
-            
+
         return "";
 
     #Carrega o player
@@ -90,8 +88,13 @@ class Util:
 
         # Inicia o browser
         print("Iniciando o browser")
-        #os.system("google-chrome --kiosk --no-sandbox --app=\"http://localhost/jsplayer\"")
-        os.system("chromium-browser --kiosk --no-sandbox --app=\"http://localhost/jsplayer\"")
+        #os.system("chromium-browser --kiosk --no-sandbox --app=\"http://localhost/jsplayer/index-linux.html\"")
+        os.system("chromium-browser --kiosk --no-sandbox --load-and-launch-app=/home/gnobrega/Projects/GnPyPlayer/chrome-ext")
+
+    # Reinicia o player
+    def reboot(self):
+        import os
+        os.system("reboot")
 
     #Move o cursor para o canto da tela
     def hideCursor(self):
@@ -102,3 +105,44 @@ class Util:
 
         for x in range(1350, 1360):
             pyautogui.moveTo(x, x)
+
+    #Envia o ping para o servidor
+    def pingServer(self, playerId):
+        import time
+        import Util
+        import urllib3
+        import Constants
+        util = Util.Util()
+        constants = Constants.Constants();
+
+        while True:
+            url = constants.SERVER_API_PING + str(playerId)
+            print("Enviando ping: " + url)
+            http = urllib3.PoolManager()
+            try:
+                response = http.request('GET', url);
+            except:
+                print("Falha no envio do ping");
+
+            time.sleep(60)
+
+    #Tira prints da tela
+    def sendScreenshot(self, playerId):
+        import time
+        import os
+        import Constants
+        import requests
+        constants = Constants.Constants()
+
+        while True:
+
+            #Captura a tela
+            image = constants.PATH_CONTENT + "screenshot.jpg"
+            os.system("scrot " + image)
+
+            #Envia ao servidor
+            url = constants.SERVER_API_UPLOAD_SCREENSHOT + playerId
+            files = {'media': open(image, 'rb')}
+            requests.post(url, files=files)
+
+            time.sleep(600)

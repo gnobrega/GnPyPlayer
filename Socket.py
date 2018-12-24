@@ -1,7 +1,9 @@
 import socketio
 import eventlet
 import eventlet.wsgi
+import Util
 from flask import Flask, render_template
+util = Util.Util();
 
 def start():
 
@@ -10,15 +12,17 @@ def start():
 
     @sio.on('connect')
     def connect(sid, environ):
-        print("BBBBBBBBBBBB")
         print("connect ", sid)
 
-    @sio.on('chat message')
-    def message(sid, data):
+    @sio.on('keep-opened')
+    def keepOpened(sid, data):
         #socket.emit("chat message", {a:123})
-        print("CCCCCCCCCCC")
-        print("message ", data)
-        sio.emit('reply', room=sid)
+        #sio.emit('reply', room=sid)
+        #sio.emit('message', data='abc')
+
+        print("Socket, received command: keep-opened");
+        util.setPreferences("keep-opened", str(data['status']))
+
 
     @sio.on('disconnect')
     def disconnect(sid):

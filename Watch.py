@@ -4,23 +4,31 @@ import psutil
 import Util
 
 class Watch:
+    firstAccess = True
+
     def start(self):
         util = Util.Util()
         print("Monitoramento iniciado (GnWatch)")
 
         while True:
 
-            #Verifica se o player está em execução
-            opened = False
-            for pid in psutil.pids():
-                p = psutil.Process(pid)
-                print(p.name())
-                #if p.name() == "chrome":
-                if "chromium-browser" in p.name():
-                    opened = True
-                    break
+            #Verifica se o modo de persistência está ativo
+            keepOpened = util.getPreferences("keep-opened")
+            if keepOpened != "False" or Watch.firstAccess == True:
+                Watch.firstAccess = False
 
-            if not opened:
-                util.startPlayer()
+                #Verifica se o player está em execução
+                opened = False
+                for pid in psutil.pids():
+                    p = psutil.Process(pid)
+                    print(p.name())
+                    #if p.name() == "chrome":
+                    #if "chromium-browser" in p.name():
+                    if "Visual Signage" in p.name():
+                        opened = True
+                        break
+
+                if not opened:
+                    util.startPlayer()
 
             time.sleep(60)
