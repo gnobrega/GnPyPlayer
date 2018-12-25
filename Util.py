@@ -89,7 +89,7 @@ class Util:
         # Inicia o browser
         print("Iniciando o browser")
         #os.system("chromium-browser --kiosk --no-sandbox --app=\"http://localhost/jsplayer/index-linux.html\"")
-        os.system("chromium-browser --kiosk --no-sandbox --load-and-launch-app=/home/gnobrega/Projects/GnPyPlayer/chrome-ext")
+        os.system("chromium-browser --kiosk --no-sandbox --load-and-launch-app=/var/www/html/chrome-ext")
 
     # Reinicia o player
     def reboot(self):
