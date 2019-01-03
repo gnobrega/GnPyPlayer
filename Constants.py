@@ -1,5 +1,6 @@
 class Constants:
     #SERVER = "http://homol.gnsignage.com.br:81/";
+    APP_NAME = "Gn Signage"
     SERVER = "http://gnsignage.com.br/";
     SERVER_API_AUTH = SERVER + "api/get-authorization?mac=";
     SERVER_API_DATA = SERVER + "api/get-player-content/?id_player="
@@ -16,3 +17,6 @@ class Constants:
     #FTP_CONTENT_PASS = 'gnsignagehomol1515';
     FTP_CONTENT_USER = 'gnsignage';
     FTP_CONTENT_PASS = 'gnsignage1515';
+    COMMAND_START_PLAYER = "chromium-browser --kiosk --no-sandbox --load-and-launch-app=/var/www/html/chrome-ext"
+    TIME_PLAYER_ON = ""
+    TIME_PLAYER_OFF = ""

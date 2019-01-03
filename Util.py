@@ -16,9 +16,10 @@ class Util:
         http = urllib3.PoolManager();
         try:
             response = http.request('GET', url);
-            objJson = json.loads(response.data);
-        except:
+            objJson = json.loads(response.data.decode('utf-8'));
+        except Exception as e:
             print("Falha na conexão");
+            print(str(e));
             #Tenta obter o id local
             playerId = util.getPreferences("id_player");
             objJson['id'] = playerId;
@@ -85,11 +86,11 @@ class Util:
     #Carrega o player
     def startPlayer(self):
         import os
+        import Constants
 
         # Inicia o browser
         print("Iniciando o browser")
-        #os.system("chromium-browser --kiosk --no-sandbox --app=\"http://localhost/jsplayer/index-linux.html\"")
-        os.system("chromium-browser --kiosk --no-sandbox --load-and-launch-app=/var/www/html/chrome-ext")
+        os.system(Constants.Constants.COMMAND_START_PLAYER)
 
     # Reinicia o player
     def reboot(self):
@@ -146,3 +147,33 @@ class Util:
             requests.post(url, files=files)
 
             time.sleep(600)
+
+    #Encerra o player
+    def closeApp(self):
+        import psutil
+
+        #Encerra o aplicativo
+        for proc in psutil.process_iter():
+            if "chromium" in proc.name():
+                proc.kill()
+
+    #Verifica se é um Raspberry
+    def isOsRaspbian(self):
+        file = open("/etc/os-release", "r")
+        contentFile = file.read()
+        if "Raspbian" in contentFile:
+            return True
+        else:
+            return False
+
+    #Desliga o monitor
+    def screenOff(self):
+        import os
+        if self.isOsRaspbian():
+            os.system("vcgencmd display_power 0")
+
+    #Liga o monitor
+    def screenOn(self):
+        import os
+        if self.isOsRaspbian():
+            os.system("vcgencmd display_power 1")

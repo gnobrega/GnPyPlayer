@@ -4,6 +4,7 @@ import eventlet.wsgi
 import Util
 from flask import Flask, render_template
 util = Util.Util();
+lastPing = 0
 
 def start():
 
@@ -23,10 +24,22 @@ def start():
         print("Socket, received command: keep-opened");
         util.setPreferences("keep-opened", str(data['status']))
 
+    @sio.on('send-ping')
+    def sendPing(sid, data):
+        import Socket
+        Socket.lastPing = 0
+
+    @sio.on('get-info')
+    def getInfo(sid, data):
+        sio.emit('get-info-response', {'keep-opened':util.getPreferences("keep-opened")})
 
     @sio.on('disconnect')
     def disconnect(sid):
         print('disconnect ', sid)
+
+    #Incrementa o registro de ociosidade
+    import threading
+    threading.Thread(target=increaseLastPing).start()
 
     #START
     # wrap Flask application with engineio's middleware
@@ -34,3 +47,12 @@ def start():
 
     # deploy as an eventlet WSGI server
     eventlet.wsgi.server(eventlet.listen(('', 8000)), app)
+
+def increaseLastPing():
+    import Socket
+    import time
+
+    while True:
+        Socket.lastPing += 10
+        time.sleep(10)
+        #print("LastPing: " + str(Socket.lastPing));

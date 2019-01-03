@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Terminal=true
+Name=GnPyPlayer
+Icon=/var/www/html/chrome-ext/128.png
+Exec=chromium-browser --kiosk --no-sandbox --load-and-launch-app=/var/www/html/chrome-ext

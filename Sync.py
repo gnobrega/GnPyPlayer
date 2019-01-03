@@ -84,6 +84,15 @@ class Sync:
                                         if not arquivo in files:
                                             files.append(arquivo);
 
+                    #Horário de funcionamento
+                    if "player" in dataJson:
+                        if "display" in dataJson['player']:
+                            display = dataJson['player']['display']
+                            if display['funcionamento_inicio'] != '00:00:00' or display['funcionamento_fim'] != '00:00:00':
+                                if display['funcionamento_inicio'] != '' or display['funcionamento_fim'] != '':
+                                    Constants.Constants.TIME_PLAYER_ON = display['funcionamento_inicio']
+                                    Constants.Constants.TIME_PLAYER_OFF = display['funcionamento_fim']
+
                     #Sincroniza os diretórios e arquivos
                     for rmtFile in files:
                         localFile = constants.PATH_CONTENT+"content/"+rmtFile;

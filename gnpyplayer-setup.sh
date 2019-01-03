@@ -44,3 +44,21 @@ pip3 install Xlib
 
 #Instala o browser
 apt-get -y install chromium-browser
+
+#Cria os atalhos
+xdg-user-dirs-update --set DESKTOP $HOME/Desktop
+rm -f /usr/share/applications/GnPyPlayer.desktop
+echo "[Desktop Entry]
+Type=Application
+Terminal=true
+Name=GnPyPlayer
+Icon=/var/www/html/chrome-ext/128.png
+Exec=chromium-browser --kiosk --no-sandbox --load-and-launch-app=/var/www/html/chrome-ext">> /usr/share/applications/GnPyPlayer.desktop
+if grep -q Ubuntu "/etc/os-release"; then
+	cp /usr/share/applications/GnPyPlayer.desktop ~/Desktop/
+	chmod 755 ~/Desktop/GnPyPlayer.desktop
+	currentuser=$(who | awk '{print $1}')
+	chown $currentuser:$currentuser ~/Desktop/GnPyPlayer.desktop
+else
+	ln -s /usr/share/applications/GnPyPlayer.desktop ~/Desktop/
+fi
