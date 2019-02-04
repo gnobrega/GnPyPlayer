@@ -7,11 +7,10 @@ import os
 import Sync
 import Socket
 
-constants = Constants.Constants()
 watch = Watch.Watch()
 util = Util.Util()
 playerId = 0
-
+isOnline = False
 
 #Inicia o socket
 threading.Thread(target=Socket.start).start()
@@ -20,27 +19,34 @@ threading.Thread(target=Socket.start).start()
 util.hideCursor()
 
 #Cria os diretórios
-os.makedirs(constants.PATH_CONTENT, exist_ok=True)
-os.makedirs(constants.PATH_JSPLAYER, exist_ok=True)
+os.makedirs(Constants.PATH_CONTENT, exist_ok=True)
+os.makedirs(Constants.PATH_JSPLAYER, exist_ok=True)
+
+#Registra a versão na máquina
+util.registerVersion()
 
 #Obtém a autorização
 objAuth = util.getAuth();
 if "auth" in objAuth:
     if objAuth['auth'] == 'allow':
         playerId = objAuth['id']
+        
+if objAuth['online'] == True:
+    isOnline = True
 
 if int(playerId) > 0:
 
     #Registra o id do player
     util.setPreferences('id_player', playerId)
-
+    
     #Envia os pings para o servidor
     threading.Thread(target=util.pingServer, args=(playerId,)).start()
 
     #Sincroniza o JsPlayer
     sync = Sync.Sync();
-    sync.syncJsPlayer();
-    
+    if isOnline == True:
+        sync.syncJsPlayer();
+        
     #Sincroniza o conteúdo
     thrSync = threading.Thread(target=sync.syncContent, args=(playerId,))
     thrSync.start();

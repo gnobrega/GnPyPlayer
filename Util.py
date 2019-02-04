@@ -6,17 +6,16 @@ class Util:
         import urllib3;
         import json;
         import Util;
-        constants = Constants.Constants();
         util = Util.Util();
         objJson = {};
-        
         mac = self.getMac();
-        url = constants.SERVER_API_AUTH + mac;
+        url = Constants.SERVER_API_AUTH + mac + "&version=" + str(Constants.VERSION);
         print("Obtendo autorização: "+url);
-        http = urllib3.PoolManager();
+        http = urllib3.PoolManager(retries=False);
         try:
             response = http.request('GET', url);
             objJson = json.loads(response.data.decode('utf-8'));
+            objJson['online'] = True
         except Exception as e:
             print("Falha na conexão");
             print(str(e));
@@ -24,7 +23,14 @@ class Util:
             playerId = util.getPreferences("id_player");
             objJson['id'] = playerId;
             objJson['auth'] = 'allow';
-            
+            objJson['online'] = False
+
+        #Verifica o segundo servidor
+        if Constants.SERVER != Constants.SERVER2:
+            if objJson['auth'] == 'deny':
+                self.changeServer();
+                objJson = self.getAuth()
+
         return objJson;
     
     #Obtém o macaddress
@@ -39,8 +45,7 @@ class Util:
         import Constants;
         import json;
         from pathlib import Path;
-        constants = Constants.Constants();
-        filePreferences = constants.PATH_CONTENT + "preferences.json";
+        filePreferences = Constants.PATH_CONTENT + "preferences.json";
         fileContent = "";
         file = Path(filePreferences);
             
@@ -66,8 +71,7 @@ class Util:
         import Constants;
         import json;
         from pathlib import Path;
-        constants = Constants.Constants();
-        filePreferences = constants.PATH_CONTENT + "preferences.json";
+        filePreferences = Constants.PATH_CONTENT + "preferences.json";
         fileContent = "";
         file = Path(filePreferences);
             
@@ -90,7 +94,7 @@ class Util:
 
         # Inicia o browser
         print("Iniciando o browser")
-        os.system(Constants.Constants.COMMAND_START_PLAYER)
+        os.system(Constants.COMMAND_START_PLAYER)
 
     # Reinicia o player
     def reboot(self):
@@ -114,12 +118,11 @@ class Util:
         import urllib3
         import Constants
         util = Util.Util()
-        constants = Constants.Constants();
 
         while True:
-            url = constants.SERVER_API_PING + str(playerId)
+            url = Constants.SERVER_API_PING + str(playerId)
             print("Enviando ping: " + url)
-            http = urllib3.PoolManager()
+            http = urllib3.PoolManager(retries=False)
             try:
                 response = http.request('GET', url);
             except:
@@ -133,16 +136,15 @@ class Util:
         import os
         import Constants
         import requests
-        constants = Constants.Constants()
 
         while True:
 
             #Captura a tela
-            image = constants.PATH_CONTENT + "screenshot.jpg"
+            image = Constants.PATH_CONTENT + "screenshot.jpg"
             os.system("scrot " + image)
 
             #Envia ao servidor
-            url = constants.SERVER_API_UPLOAD_SCREENSHOT + playerId
+            url = Constants.SERVER_API_UPLOAD_SCREENSHOT + playerId
             files = {'media': open(image, 'rb')}
             requests.post(url, files=files)
 
@@ -177,3 +179,22 @@ class Util:
         import os
         if self.isOsRaspbian():
             os.system("vcgencmd display_power 1")
+
+    #Registra a versão na máquina
+    def registerVersion(self):
+        import Constants
+        file = open(Constants.PATH_VERSION, "w+")
+        file.write(str(Constants.VERSION))
+        file.close()
+
+    #Troca o servidor
+    def changeServer(self):
+        import Constants
+        Constants.SERVER = Constants.SERVER2
+        Constants.SERVER_URL = Constants.SERVER + "downloads/gnpyplayer/version.txt"
+        Constants.SERVER_API_AUTH = Constants.SERVER + "api/get-authorization?linux=true&mac=";
+        Constants.SERVER_API_DATA = Constants.SERVER + "api/get-player-content/?id_player="
+        Constants.SERVER_API_PING = Constants.SERVER + "api/ping/?id_player="
+        Constants.SERVER_API_UPLOAD_SCREENSHOT = Constants.SERVER + "api/send-screenshot/id_player/"
+        Constants.FTP_JS_HOST = 'plux.gnsignage.com.br';
+        Constants.FTP_CONTENT_HOST = Constants.FTP_JS_HOST;

@@ -3,10 +3,9 @@ class Sync:
     #Sincroniza o JsPlayer
     def syncJsPlayer(self):
         import Constants;
-        constants = Constants.Constants();
-        self.sync(constants.FTP_JS_HOST, 
-                  constants.FTP_JS_USER, constants.FTP_JS_PASS,
-                  "/", constants.PATH_JSPLAYER);
+        self.sync(Constants.FTP_JS_HOST,
+                  Constants.FTP_JS_USER, Constants.FTP_JS_PASS,
+                  "/", Constants.PATH_JSPLAYER);
 
         #Sincroniza as libs
         self.syncLibs();
@@ -15,13 +14,12 @@ class Sync:
     def syncLibs(self):
         import Constants;
         import os;
-        constants = Constants.Constants();
 
         print("Sincronizando as libs");
-        os.makedirs(constants.PATH_CONTENT+"content/lib", mode=0o777, exist_ok=True);
-        self.sync(constants.FTP_CONTENT_HOST,
-                  constants.FTP_CONTENT_USER, constants.FTP_CONTENT_PASS,
-                  "/lib/", constants.PATH_CONTENT+"content/lib");
+        os.makedirs(Constants.PATH_CONTENT+"content/lib", mode=0o777, exist_ok=True);
+        self.sync(Constants.FTP_CONTENT_HOST,
+                  Constants.FTP_CONTENT_USER, Constants.FTP_CONTENT_PASS,
+                  "/lib/", Constants.PATH_CONTENT+"content/lib");
         
     #Sincroniza o conteúdo
     def syncContent(self, playerId):
@@ -34,11 +32,10 @@ class Sync:
         import time;
         import threading
         from pathlib import Path;
-        constants = Constants.Constants();
         
         #Cria os diretórios
-        os.makedirs(constants.PATH_CONTENT, mode=0o777, exist_ok=True);
-        os.makedirs(constants.PATH_CONTENT+"content", mode=0o777, exist_ok=True);
+        os.makedirs(Constants.PATH_CONTENT, mode=0o777, exist_ok=True);
+        os.makedirs(Constants.PATH_CONTENT+"content", mode=0o777, exist_ok=True);
         print("Diretórios de conteúdo criados");
 
         while True:
@@ -46,9 +43,9 @@ class Sync:
             arrAccountsRunning = []
 
             #Atualiza o arquivo de dados json
-            url = constants.SERVER_API_DATA + playerId;
+            url = Constants.SERVER_API_DATA + playerId;
             http = urllib3.PoolManager();
-            fileData = constants.PATH_CONTENT+"data.json";
+            fileData = Constants.PATH_CONTENT+"data.json";
             print("Obtendo o arquivo de dados (data.json)");
             try:
                 response = http.request('GET', url);
@@ -90,24 +87,24 @@ class Sync:
                             display = dataJson['player']['display']
                             if display['funcionamento_inicio'] != '00:00:00' or display['funcionamento_fim'] != '00:00:00':
                                 if display['funcionamento_inicio'] != '' or display['funcionamento_fim'] != '':
-                                    Constants.Constants.TIME_PLAYER_ON = display['funcionamento_inicio']
-                                    Constants.Constants.TIME_PLAYER_OFF = display['funcionamento_fim']
+                                    Constants.TIME_PLAYER_ON = display['funcionamento_inicio']
+                                    Constants.TIME_PLAYER_OFF = display['funcionamento_fim']
 
                     #Sincroniza os diretórios e arquivos
                     for rmtFile in files:
-                        localFile = constants.PATH_CONTENT+"content/"+rmtFile;
+                        localFile = Constants.PATH_CONTENT+"content/"+rmtFile;
                         extras = "";
-                        self.sync(constants.FTP_CONTENT_HOST,
-                                  constants.FTP_CONTENT_USER,
-                                  constants.FTP_CONTENT_PASS,
+                        self.sync(Constants.FTP_CONTENT_HOST,
+                                  Constants.FTP_CONTENT_USER,
+                                  Constants.FTP_CONTENT_PASS,
                                   rmtFile,
                                   localFile);
 
                     #Remove as mídias que não são mais utilizadas
-                    for dir in os.listdir(constants.PATH_CONTENT+"content") :
+                    for dir in os.listdir(Constants.PATH_CONTENT+"content") :
                         if dir != "lib":
-                            for subdir in os.listdir(constants.PATH_CONTENT+"content/"+dir):
-                                realPath = constants.PATH_CONTENT+"content/"+dir+"/"+subdir;
+                            for subdir in os.listdir(Constants.PATH_CONTENT+"content/"+dir):
+                                realPath = Constants.PATH_CONTENT+"content/"+dir+"/"+subdir;
                                 midiaPath = dir+"/"+subdir;
                                 isDir = False;
                                 if os.path.isdir(realPath):
@@ -153,7 +150,6 @@ class Sync:
         import os
         import Constants
         import time
-        constants = Constants.Constants();
 
         intervalo = int(conta["intervalo"])
         intervalo = intervalo * 60
@@ -163,7 +159,7 @@ class Sync:
         senha = conta["senha"]
         origem = conta["origem"]
         destino = conta["destino"]
-        destino = destino.replace("C:\\3MIDIA\\", constants.PATH_CLIENT_CONTENT)
+        destino = destino.replace("C:\\3MIDIA\\", Constants.PATH_CLIENT_CONTENT)
         destino = destino.replace("\\", "/")
 
         #Ignora em caso de não preenchimento

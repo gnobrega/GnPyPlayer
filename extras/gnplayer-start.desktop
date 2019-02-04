@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Exec=gnome-terminal --command "sh /var/www/html/GnPyPlayer/extras/autostart.sh"
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_NG]=Terminal
+Name=GnPyPlayer Startup
+Comment[en_NG]=GnPyPlayer Startup
+Comment=GnPyPlayer Startup

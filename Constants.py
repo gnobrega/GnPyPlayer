@@ -1,22 +1,35 @@
-class Constants:
-    #SERVER = "http://homol.gnsignage.com.br:81/";
-    APP_NAME = "Gn Signage"
-    SERVER = "http://gnsignage.com.br/";
-    SERVER_API_AUTH = SERVER + "api/get-authorization?mac=";
-    SERVER_API_DATA = SERVER + "api/get-player-content/?id_player="
-    SERVER_API_PING = SERVER + "api/ping/?id_player="
-    SERVER_API_UPLOAD_SCREENSHOT = SERVER + "api/send-screenshot/id_player/"
-    PATH_CONTENT = "/var/www/html/gncontent/"
-    PATH_JSPLAYER = "/var/www/html/jsplayer/"
-    PATH_CLIENT_CONTENT = "/var/www/html/content/"
-    FTP_JS_HOST = 'gnsignage.com.br';
-    FTP_JS_USER = 'jsplayer';
-    FTP_JS_PASS = 'jsplayer1515';
-    FTP_CONTENT_HOST = FTP_JS_HOST;
-    #FTP_CONTENT_USER = 'gnsignagehomol';
-    #FTP_CONTENT_PASS = 'gnsignagehomol1515';
-    FTP_CONTENT_USER = 'gnsignage';
-    FTP_CONTENT_PASS = 'gnsignage1515';
-    COMMAND_START_PLAYER = "chromium-browser --kiosk --no-sandbox --load-and-launch-app=/var/www/html/chrome-ext"
-    TIME_PLAYER_ON = ""
-    TIME_PLAYER_OFF = ""
+VERSION = 1.02
+
+global SERVER
+global SERVER2
+global SERVER_URL
+global SERVER_API_AUTH
+global SERVER_API_DATA
+global SERVER_API_PING
+global SERVER_API_UPLOAD_SCREENSHOT
+global FTP_JS_HOST
+global FTP_CONTENT_HOST
+
+APP_NAME = "Gn Signage"
+SERVER = "http://srv1.gnsignage.com.br/";
+SERVER2 = "http://plux.gnsignage.com.br/";
+SERVER_URL = SERVER + "downloads/gnpyplayer/version.txt"
+SERVER_API_AUTH = SERVER + "api/get-authorization?linux=true&mac=";
+SERVER_API_DATA = SERVER + "api/get-player-content/?id_player="
+SERVER_API_PING = SERVER + "api/ping/?id_player="
+SERVER_API_UPLOAD_SCREENSHOT = SERVER + "api/send-screenshot/id_player/"
+PATH_CONTENT = "/var/www/html/gncontent/"
+PATH_JSPLAYER = "/var/www/html/jsplayer/"
+PATH_VERSION = PATH_CONTENT + "/version.txt"
+PATH_CLIENT_CONTENT = "/var/www/html/content/"
+FTP_JS_HOST = 'srv1.gnsignage.com.br';
+FTP_JS_USER = 'jsplayer';
+FTP_JS_PASS = 'jsplayer1515';
+FTP_CONTENT_HOST = FTP_JS_HOST;
+FTP_CONTENT_USER = 'gnsignage';
+FTP_CONTENT_PASS = 'gnsignage1515';
+COMMAND_START_PLAYER = "chromium-browser --kiosk --app=http://localhost/jsplayer/index-linux.html"
+TIME_PLAYER_ON = ""
+TIME_PLAYER_OFF = ""
+TIME_PLAYER_OFF = ""
+
