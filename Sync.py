@@ -101,21 +101,23 @@ class Sync:
                                   localFile);
 
                     #Remove as mídias que não são mais utilizadas
-                    for dir in os.listdir(Constants.PATH_CONTENT+"content") :
-                        if dir != "lib":
-                            for subdir in os.listdir(Constants.PATH_CONTENT+"content/"+dir):
-                                realPath = Constants.PATH_CONTENT+"content/"+dir+"/"+subdir;
-                                midiaPath = dir+"/"+subdir;
-                                isDir = False;
-                                if os.path.isdir(realPath):
-                                    isDir = True;
-                                    midiaPath = midiaPath + "/";
-                                if not midiaPath in files:
-                                    print("Removendo mídia: "+realPath);
-                                    if not isDir:
-                                        os.remove(realPath);
-                                    else:
-                                        shutil.rmtree(realPath);
+                    countFiles = len(files)
+                    if countFiles > 0:
+                        for dir in os.listdir(Constants.PATH_CONTENT+"content") :
+                            if dir != "lib":
+                                for subdir in os.listdir(Constants.PATH_CONTENT+"content/"+dir):
+                                    realPath = Constants.PATH_CONTENT+"content/"+dir+"/"+subdir;
+                                    midiaPath = dir+"/"+subdir;
+                                    isDir = False;
+                                    if os.path.isdir(realPath):
+                                        isDir = True;
+                                        midiaPath = midiaPath + "/";
+                                    if not midiaPath in files:
+                                        print("Removendo mídia: "+realPath);
+                                        if not isDir:
+                                            os.remove(realPath);
+                                        else:
+                                            shutil.rmtree(realPath);
 
                     #Sincroniza os pares de pastas
                     if "contas" in dataJson:

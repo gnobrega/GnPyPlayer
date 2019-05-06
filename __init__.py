@@ -45,7 +45,14 @@ if int(playerId) > 0:
     #Sincroniza o JsPlayer
     sync = Sync.Sync();
     if isOnline == True:
-        sync.syncJsPlayer();
+
+        #Verifica se o JsPlayer já foi baixado, se sim, atualiza em background
+        if os.path.exists(Constants.PATH_JSPLAYER+"index.html"):
+            print("Sincronizando o JsPlayer em background");
+            threading.Thread(target=sync.syncJsPlayer).start()
+        else:
+            print("Sincronizando o JsPlayer em primeiro plano");
+            sync.syncJsPlayer();
         
     #Sincroniza o conteúdo
     thrSync = threading.Thread(target=sync.syncContent, args=(playerId,))

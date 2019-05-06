@@ -10,6 +10,7 @@ class Watch:
         util = Util.Util()
         print("Monitoramento iniciado (GnWatch)")
         time.sleep(10)
+        SCREEN_ON = True
 
         while True:
 
@@ -37,11 +38,16 @@ class Watch:
                     print("Fora do horário de funcionamento: "+Constants.TIME_PLAYER_ON+" - "+Constants.TIME_PLAYER_OFF)
                     onTime = False
                     util.closeApp()
+                    SCREEN_ON = False
                     #Desliga o monitor
                     util.screenOff()
 
             #Verifica se está dentro do período de exibição do player
             if onTime:
+                if SCREEN_ON == False:
+                    util.reboot()
+
+                #Liga a tela
                 util.screenOn()
 
                 #Verifica se o modo de persistência está ativo
@@ -50,7 +56,8 @@ class Watch:
 
                     #Verifica se o player está em execução
                     import Socket
-                    if Socket.lastPing > 200 or Watch.firstAccess == True:
+                    print("Tempo de ociosidade: " + str(Socket.lastPing) + "s")
+                    if Socket.lastPing > 600 or Watch.firstAccess == True:
                         threading.Thread(target=util.startPlayer).start()
 
                     Watch.firstAccess = False

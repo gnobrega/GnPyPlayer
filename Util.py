@@ -92,6 +92,9 @@ class Util:
         import os
         import Constants
 
+        # Fecha o browser caso ja esteja aberto
+        self.closeApp()
+
         # Inicia o browser
         print("Iniciando o browser")
         os.system(Constants.COMMAND_START_PLAYER)
@@ -138,16 +141,19 @@ class Util:
         import requests
 
         while True:
+            try:
+                #Captura a tela
+                image = Constants.PATH_CONTENT + "screenshot.jpg"
+                os.system("scrot " + image)
 
-            #Captura a tela
-            image = Constants.PATH_CONTENT + "screenshot.jpg"
-            os.system("scrot " + image)
-
-            #Envia ao servidor
-            url = Constants.SERVER_API_UPLOAD_SCREENSHOT + playerId
-            files = {'media': open(image, 'rb')}
-            requests.post(url, files=files)
-
+                #Envia ao servidor
+                url = Constants.SERVER_API_UPLOAD_SCREENSHOT + playerId
+                files = {'media': open(image, 'rb')}
+                requests.post(url, files=files)
+            except Exception as e:
+                print("Falha no envio de screenshot");
+                print(str(e));
+                
             time.sleep(600)
 
     #Encerra o player
@@ -179,6 +185,11 @@ class Util:
         import os
         if self.isOsRaspbian():
             os.system("vcgencmd display_power 1")
+
+    #Reinicia a máquina
+    def reboot(self):
+        import os
+        os.system("reboot")
 
     #Registra a versão na máquina
     def registerVersion(self):
