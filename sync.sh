@@ -8,6 +8,7 @@ LCD="/home/gnobrega/sync"     	#Your local directory
 RCD="/"               			#FTP server directory
 
 lftp -f "
+set net:timeout 60;
 open $1
 user $2 $3
 lcd $5

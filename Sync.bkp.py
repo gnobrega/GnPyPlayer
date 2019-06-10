@@ -64,7 +64,6 @@ class Sync:
             #Realiza a leitura do arquivo json
             file = Path(fileData);
             files = [];
-            medias = [];
             if file.exists():
                 objFile = open(fileData, 'r');
                 dataStr = objFile.read();
@@ -81,7 +80,6 @@ class Sync:
                                         arquivo = midia['arquivo'].replace("./upload/midia/", "");
                                         if not arquivo in files:
                                             files.append(arquivo);
-                                            medias.append(midia)
 
                     #Horário de funcionamento
                     if "player" in dataJson:
@@ -93,16 +91,14 @@ class Sync:
                                     Constants.TIME_PLAYER_OFF = display['funcionamento_fim']
 
                     #Sincroniza os diretórios e arquivos
-                    for rmtMedia in medias:
-                        self.syncMedia(rmtMedia)
-                    '''for rmtFile in files:
+                    for rmtFile in files:
                         localFile = Constants.PATH_CONTENT+"content/"+rmtFile;
                         extras = "";
                         self.sync(Constants.FTP_CONTENT_HOST,
                                   Constants.FTP_CONTENT_USER,
                                   Constants.FTP_CONTENT_PASS,
                                   rmtFile,
-                                  localFile);'''
+                                  localFile);
 
                     #Remove as mídias que não são mais utilizadas
                     countFiles = len(files)
@@ -137,42 +133,7 @@ class Sync:
 
             #Aguarda por 5min
             time.sleep(300);
-    
-    #Sincroniza mídia
-    def syncMedia(self, media):
-        import Constants
-        import os
-        import urllib.request
-        
-        if media['arquivo'][-1:] != "/":
-            download = True
-            
-            #Arquivos
-            mediaSrc = Constants.SERVER + media['arquivo'][2:]
-            mediaDst = Constants.PATH_CONTENT + "content" + media['arquivo'][14:]
-            
-            #Verifica se o arquivo já existe
-            if os.path.isfile(mediaDst):
-                info = os.stat(mediaDst);
-                #Compara o tamanho
-                if int(media["tamanho"]) == int(info.st_size):
-                    #Compara a data de modificação
-                    if media["dt_modificacao"] < info.st_mtime:
-                        download = False
-                        
-            #Download
-            if download:
-                print("Realizando o download da mídia: " + mediaSrc)
-                #Remove o arquivo antigo
-                if os.path.isfile(mediaDst):
-                    os.remove(mediaDst)
-                #Cria o diretório
-                idx = mediaDst.rfind('/')+1
-                if os.path.isdir(mediaDst[:idx]) != True:
-                    os.makedirs(mediaDst[:idx])
-                #Download HTTP
-                urllib.request.urlretrieve(mediaSrc, mediaDst)  
-    
+                    
     #Executa a sincronia
     def sync(self, host, user, password, src, dst):
         import os;
