@@ -34,17 +34,7 @@ class Watch:
 
                 timeOn = int(Constants.TIME_PLAYER_ON.replace(":", ""))
                 timeOff = int(Constants.TIME_PLAYER_OFF.replace(":", ""))
-                
-                #Início antes do fim
-                if timeOff > timeOn:
-                    if timeOn > currentHour or timeOff < currentHour:
-                        onTime = False
-                        
-                else: #Fim antes do início
-                    if currentHour > timeOff and currentHour < timeOn:
-                        onTime = False
-                        
-                if onTime == False:
+                if timeOn > currentHour or timeOff < currentHour:
                     print("Fora do horário de funcionamento: "+Constants.TIME_PLAYER_ON+" - "+Constants.TIME_PLAYER_OFF)
                     onTime = False
                     util.closeApp()
