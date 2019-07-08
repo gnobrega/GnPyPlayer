@@ -28,7 +28,8 @@ FTP_JS_PASS = 'jsplayer1515';
 FTP_CONTENT_HOST = FTP_JS_HOST;
 FTP_CONTENT_USER = 'gnsignage';
 FTP_CONTENT_PASS = 'gnsignage1515';
-COMMAND_START_PLAYER = "chromium-browser --kiosk --app=http://localhost/jsplayer/index-linux.html"
+COMMAND_START_PLAYER = "chromium-browser --enable-logging --v=1 --kiosk --app=http://localhost/jsplayer/index-linux.html"
+#COMMAND_START_PLAYER = "chromium-browser --enable-logging --v=1 http://localhost/jsplayer/index-linux.html"
 TIME_PLAYER_ON = ""
 TIME_PLAYER_OFF = ""
 TIME_PLAYER_OFF = ""

@@ -51,7 +51,7 @@ class Sync:
                 response = http.request('GET', url);
             except:
                 print("Erro ao baixar o arquivo de dados");
-            if response.data != "":
+            if response and response.data != "":
                 #Grava o arquivo local
                 objFile = open(fileData, 'w');
                 respData = str(response.data);
@@ -95,14 +95,6 @@ class Sync:
                     #Sincroniza os diretórios e arquivos
                     for rmtMedia in medias:
                         self.syncMedia(rmtMedia)
-                    '''for rmtFile in files:
-                        localFile = Constants.PATH_CONTENT+"content/"+rmtFile;
-                        extras = "";
-                        self.sync(Constants.FTP_CONTENT_HOST,
-                                  Constants.FTP_CONTENT_USER,
-                                  Constants.FTP_CONTENT_PASS,
-                                  rmtFile,
-                                  localFile);'''
 
                     #Remove as mídias que não são mais utilizadas
                     countFiles = len(files)
@@ -135,43 +127,34 @@ class Sync:
                                                            args=(conta,))
                                 thrSync.start();
 
-            #Aguarda por 5min
-            time.sleep(300);
+            #Aguarda por 15min
+            time.sleep(900);
     
     #Sincroniza mídia
     def syncMedia(self, media):
         import Constants
+        import Util
         import os
-        import urllib.request
+        util = Util.Util()
         
+        #Extrai os caminhos da mídia
+        mediaSrc = Constants.SERVER + media['arquivo'][2:]
+        mediaDst = Constants.PATH_CONTENT + "content" + media['arquivo'][14:]
+        
+        #Arquivos
         if media['arquivo'][-1:] != "/":
-            download = True
             
-            #Arquivos
-            mediaSrc = Constants.SERVER + media['arquivo'][2:]
-            mediaDst = Constants.PATH_CONTENT + "content" + media['arquivo'][14:]
+            #Executa o download
+            util.syncFileHttp(mediaSrc, mediaDst, int(media["tamanho"]), media["dt_modificacao"])
             
-            #Verifica se o arquivo já existe
-            if os.path.isfile(mediaDst):
-                info = os.stat(mediaDst);
-                #Compara o tamanho
-                if int(media["tamanho"]) == int(info.st_size):
-                    #Compara a data de modificação
-                    if media["dt_modificacao"] < info.st_mtime:
-                        download = False
-                        
-            #Download
-            if download:
-                print("Realizando o download da mídia: " + mediaSrc)
-                #Remove o arquivo antigo
-                if os.path.isfile(mediaDst):
-                    os.remove(mediaDst)
-                #Cria o diretório
-                idx = mediaDst.rfind('/')+1
-                if os.path.isdir(mediaDst[:idx]) != True:
-                    os.makedirs(mediaDst[:idx])
-                #Download HTTP
-                urllib.request.urlretrieve(mediaSrc, mediaDst)  
+        #Pastas
+        else:
+            if "sub_arquivos" in media:
+                for subFile in media['sub_arquivos']:
+                    fileDst = Constants.PATH_CONTENT + "content" + subFile['src'][1:]
+                    fileSrc = Constants.SERVER + "upload/midia" + subFile['src'][1:]
+                    #Executa o download
+                    util.syncFileHttp(fileSrc, fileDst, int(subFile["tamanho"]), subFile["dt_modificacao"])
     
     #Executa a sincronia
     def sync(self, host, user, password, src, dst):

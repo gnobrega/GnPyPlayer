@@ -30,7 +30,8 @@ objAuth = util.getAuth();
 if "auth" in objAuth:
     if objAuth['auth'] == 'allow':
         playerId = objAuth['id']
-        
+
+#Verifica a conexão  
 if objAuth['online'] == True:
     isOnline = True
 
@@ -39,7 +40,7 @@ if int(playerId) > 0:
     #Registra o id do player
     util.setPreferences('id_player', playerId)
     
-    #Envia os pings para o servidor
+    #Envia o status ONLINE para o servidor
     threading.Thread(target=util.pingServer, args=(playerId,)).start()
 
     #Sincroniza o JsPlayer
@@ -58,8 +59,11 @@ if int(playerId) > 0:
     thrSync = threading.Thread(target=sync.syncContent, args=(playerId,))
     thrSync.start();
 
-    #Abre e monitora a execução do player
+    #Inicia e monitora a execução do player
     threading.Thread(target=watch.start).start()
 
     # Realiza a captura de tela e o envio ao servidor
     threading.Thread(target=util.sendScreenshot, args=(playerId,)).start()
+
+else:
+    print("ERRO! Player não cadastrado. Mac: "+util.getMac())

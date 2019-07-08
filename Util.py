@@ -124,7 +124,7 @@ class Util:
 
         while True:
             url = Constants.SERVER_API_PING + str(playerId)
-            print("Enviando ping: " + url)
+            print("Mantendo a comunicação com o servidor (status = on): " + url)
             http = urllib3.PoolManager(retries=False)
             try:
                 response = http.request('GET', url);
@@ -141,6 +141,7 @@ class Util:
         import requests
 
         while True:
+            time.sleep(600)
             try:
                 #Captura a tela
                 image = Constants.PATH_CONTENT + "screenshot.jpg"
@@ -153,23 +154,24 @@ class Util:
             except Exception as e:
                 print("Falha no envio de screenshot");
                 print(str(e));
-                
-            time.sleep(600)
-
+            
     #Encerra o player
     def closeApp(self):
         import psutil
 
-        #Encerra o aplicativo
-        for proc in psutil.process_iter():
-            if "chromium" in proc.name():
-                proc.kill()
+        try:
+            #Encerra o aplicativo
+            for proc in psutil.process_iter():
+                if "chromium" in proc.name():
+                    proc.kill()
+        except Exception as e:
+            print("Falha ao encerrar o player");
 
     #Verifica se é um Raspberry
     def isOsRaspbian(self):
         file = open("/etc/os-release", "r")
         contentFile = file.read()
-        if "Raspbian" in contentFile:
+        if "Raspbian" in contentFile or "bionic" in contentFile:
             return True
         else:
             return False
@@ -209,3 +211,50 @@ class Util:
         Constants.SERVER_API_UPLOAD_SCREENSHOT = Constants.SERVER + "api/send-screenshot/id_player/"
         Constants.FTP_JS_HOST = 'plux.gnsignage.com.br';
         Constants.FTP_CONTENT_HOST = Constants.FTP_JS_HOST;
+
+    #Sincroniza um arquivo via HTTP
+    def syncFileHttp(self, src, dst, fileSize, fileUpdate):
+        import Constants
+        import os
+        import urllib.request
+        from urllib.parse import urlparse
+        download = True
+        
+        try:
+        
+            #Verifica se o arquivo já existe
+            if os.path.isfile(dst):
+                info = os.stat(dst);
+                #Compara o tamanho
+                if int(fileSize) == int(info.st_size):
+                    #Compara a data de modificação
+                    if int(fileUpdate) < info.st_mtime:
+                        download = False
+                        
+            #Trata a url
+            params = src.split("/")
+            src = "";
+            count = 0
+            for param in params:
+                if count > 1:
+                    src = src + urllib.parse.quote(param) + "/"
+                else:
+                    src = src + param + "/"
+                count = count + 1
+            src = src[:-1]
+                        
+            #Download
+            if download:
+                print("Realizando o download via HTTP: " + src)
+                #Remove o arquivo antigo
+                if os.path.isfile(dst):
+                    os.remove(dst)
+                #Cria o diretório
+                idx = dst.rfind('/')+1
+                if os.path.isdir(dst[:idx]) != True:
+                    os.makedirs(dst[:idx])
+                #Download HTTP
+                urllib.request.urlretrieve(src, dst)
+                
+        except:
+                print("Falha no download (HTTP) do arquivo: "+src);
