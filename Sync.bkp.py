@@ -32,7 +32,6 @@ class Sync:
         import time;
         import threading
         from pathlib import Path;
-        syncFoldersPairsStarted = False
         
         #Cria os diretórios
         os.makedirs(Constants.PATH_CONTENT, mode=0o777, exist_ok=True);
@@ -116,14 +115,9 @@ class Sync:
                                         else:
                                             shutil.rmtree(realPath);
 
-                    #Sincroniza todos os pares de pastas
+                    #Sincroniza os pares de pastas
                     if "contas" in dataJson:
-                        if syncFoldersPairsStarted == False:
-                            syncFoldersPairsStarted = True
-                            contas = dataJson['contas']
-                            thrSync = threading.Thread(target=self.syncAllFoldersPairs, args=(contas,))
-                            thrSync.start();
-                        '''
+                        contas = dataJson['contas']
                         for conta in contas:
                             contaId = conta['id']
                             if contaId not in arrAccountsRunning:
@@ -131,7 +125,7 @@ class Sync:
                                 # Sincronia o par de pastas em thread
                                 thrSync = threading.Thread(target=self.syncFolderPair,
                                                            args=(conta,))
-                                thrSync.start();'''
+                                thrSync.start();
 
             #Aguarda por 15min
             time.sleep(900);
@@ -175,19 +169,6 @@ class Sync:
         else:
             self.syncFile(host, user, password, src, dst)
 
-    # Sincroniza todos os pares de pastas
-    def syncAllFoldersPairs(self, contas):
-        import time
-        try:
-            for conta in contas:
-                print("# Sincronizando conta FTP: "+conta["nome"])
-                self.syncFolderPair(conta)
-        except Exception as e:
-            print(str(e))
-            
-        time.sleep(900)
-        self.syncAllFoldersPairs(contas)
-
     # Sincroniza um par de pastas
     def syncFolderPair(self, conta):
         import os
@@ -211,12 +192,12 @@ class Sync:
 
         #Cria os diretorios
         os.makedirs(destino, mode=0o777, exist_ok=True);
-        
-        #Executa
-        self.sync(host, usuario, senha, origem, destino)
+
+        while True:
+            self.sync(host, usuario, senha, origem, destino)
 
             #Aguarda até a próxima sincronia
-            #time.sleep(300);
+            time.sleep(300);
 
     # Executa a sincronia de um arquivo
     def syncFile(self, host, user, password, src, dst):
