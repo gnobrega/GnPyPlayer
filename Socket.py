@@ -40,6 +40,14 @@ def start():
     def sendPing(sid, data):
         import Socket
         Socket.lastPing = 0
+        
+    #Recebe comando do JavaScript
+    @sio.on('call-app')
+    def callApp(sid, data):
+        if "action" in data:
+            if data['action'] == "log-view":
+                if "data" in data:
+                    util.logView(data['data'])
 
     @sio.on('get-info')
     def getInfo(sid, data):

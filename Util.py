@@ -258,3 +258,46 @@ class Util:
                 
         except:
                 print("Falha no download (HTTP) do arquivo: "+src);
+    
+    #Registra o log de visualização
+    def logView(self, data):
+        import os
+        import Constants
+        import datetime
+        
+        now = datetime.datetime.now()
+        print()
+        
+        # Obtém o id do player
+        playerId = self.getPreferences("id_player");
+        
+        if int(playerId): 
+            
+            #Cria o diretório se não existir
+            path = Constants.PATH_CONTENT+"logs/log_view/"+str(now.year)+"/"+str(now.month)+"/"+str(now.day)
+            src = path + "/"+playerId+".log"
+            try: 
+                os.makedirs(path)
+            except:
+                pass 
+                
+            #Abre o arquivo para gravação
+            try: 
+                virgula = "";
+                
+                #Verifica se já existe
+                if os.path.exists(src) == True:
+                    fileLogr = open(src, 'r')
+                    if fileLogr.read() != "":
+                        virgula = ",\n";
+                    fileLogr.close()
+
+                #Grava
+                data = str(data).replace("'", "\"")
+                if str(data) != "":
+                    fileLog = open(src, 'a+')
+                    fileLog.write(str(virgula)+str(data))
+                    fileLog.close()
+                
+            except:
+                pass 
