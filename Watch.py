@@ -63,16 +63,12 @@ class Watch:
                 #Liga a tela
                 util.screenOn()
 
-                #Verifica se o modo de persistência está ativo
-                keepOpened = util.getPreferences("keep-opened")
-                if keepOpened != "False" or Watch.firstAccess == True:
+                #Verifica se o player está em execução
+                import Socket
+                print("Tempo de ociosidade: " + str(Socket.lastPing) + "s")
+                if Socket.lastPing > 240 or Watch.firstAccess == True:
+                    threading.Thread(target=util.startPlayer).start()
 
-                    #Verifica se o player está em execução
-                    import Socket
-                    print("Tempo de ociosidade: " + str(Socket.lastPing) + "s")
-                    if Socket.lastPing > 240 or Watch.firstAccess == True:
-                        threading.Thread(target=util.startPlayer).start()
-
-                    Watch.firstAccess = False
+                Watch.firstAccess = False
 
             time.sleep(30)

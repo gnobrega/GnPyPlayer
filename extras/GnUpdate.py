@@ -29,6 +29,9 @@ try:
     #Executa a sincronia
     if TO_UPDATE:
         command = 'lftp -f "\n'
+        command += 'set ftp:ssl-allow false \n';
+        command += 'set ftp:use-feat false \n';
+        command += 'set net:timeout 60 \n';
         command += 'open gnsignage.com.br\n'
         command += 'user gnpyplayer gnpyplayer1515\n'
         command += 'lcd /var/www/html/GnPyPlayer\n'
