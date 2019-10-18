@@ -64,6 +64,9 @@ if int(playerId) > 0:
 
     # Realiza a captura de tela e o envio ao servidor
     threading.Thread(target=util.sendScreenshot, args=(playerId,)).start()
+    
+    #Envia os logs para o servidor
+    threading.Thread(target=sync.syncLogsView, args=(playerId,)).start()
 
 else:
     print("ERRO! Player não cadastrado. Mac: "+util.getMac())

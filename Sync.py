@@ -123,15 +123,6 @@ class Sync:
                             contas = dataJson['contas']
                             thrSync = threading.Thread(target=self.syncAllFoldersPairs, args=(contas,))
                             thrSync.start();
-                        '''
-                        for conta in contas:
-                            contaId = conta['id']
-                            if contaId not in arrAccountsRunning:
-                                arrAccountsRunning.append(contaId)
-                                # Sincronia o par de pastas em thread
-                                thrSync = threading.Thread(target=self.syncFolderPair,
-                                                           args=(conta,))
-                                thrSync.start();'''
 
             #Aguarda por 15min
             time.sleep(900);
@@ -265,3 +256,26 @@ class Sync:
                 if os.path.isfile(dst):
                     print("Removendo arquivo local: " + dst)
                     os.remove(dst)
+     
+    # Sincroniza os logs com o servidor 
+    def syncLogsView(self, playerId):
+        import time
+        import Constants
+        import os
+       
+        while True:
+            
+            cmd = 'lftp -f "\n\
+                set ftp:ssl-allow false\n\
+                set ftp:use-feat false\n\
+                set net:timeout 60\n\
+                open '+Constants.FTP_LOGS_HOST+'\n\
+                user '+Constants.FTP_LOGS_USER+' '+Constants.FTP_LOGS_PASS+'\n\
+                lcd /var/www/html/GnPyPlayer\n\
+                mirror -R --continue --verbose /var/www/html/gncontent/logs/log_view /log_view\n\
+                bye\n\
+                "'
+            os.system(cmd)
+            
+            # Sincroniza os logs a cada 1 hora
+            time.sleep(3600)
