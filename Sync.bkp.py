@@ -262,52 +262,20 @@ class Sync:
         import time
         import Constants
         import os
-        import datetime
-        import shutil
-        
+       
         while True:
             
-            srcLogview = '/var/www/html/gncontent/logs/log_view'
-            now = datetime.datetime.now()
-            currentFolder = srcLogview+"/"+str(now.year)+"/"+str(now.month)+"/"+str(now.day)
-            # Verifica se o diretório existe
-            if os.path.isdir(srcLogview):
-                
-                # Elimina os logs antigos
-                for sub1 in os.listdir(srcLogview):
-                    src1 = srcLogview+"/"+sub1
-                    if src1 == srcLogview+"/"+str(now.year):
-                        print("IGUAALLL")
-                        for sub2 in os.listdir(src1):
-                            src2 = src1+"/"+sub2
-                            if src2 == srcLogview+"/"+str(now.year)+"/"+str(now.month):
-                                for sub3 in os.listdir(src2):
-                                    src3 = src2+"/"+sub3  
-                                    
-                                    # Dias anteriores
-                                    if src3 != currentFolder:
-                                        # Remove
-                                        shutil.rmtree(src3)
-                                        
-                            else:
-                                # Remove
-                                shutil.rmtree(src2)
-                    else:
-                        # Remove
-                        shutil.rmtree(src1)
-                
-                # Envia os logs do dia atual
-                cmd = 'lftp -f "\n\
-                    set ftp:ssl-allow false\n\
-                    set ftp:use-feat false\n\
-                    set net:timeout 60\n\
-                    open '+Constants.FTP_LOGS_HOST+'\n\
-                    user '+Constants.FTP_LOGS_USER+' '+Constants.FTP_LOGS_PASS+'\n\
-                    lcd /var/www/html/GnPyPlayer\n\
-                    mirror -R --continue --verbose /var/www/html/gncontent/logs/log_view /log_view\n\
-                    bye\n\
-                    "'
-                os.system(cmd)
+            cmd = 'lftp -f "\n\
+                set ftp:ssl-allow false\n\
+                set ftp:use-feat false\n\
+                set net:timeout 60\n\
+                open '+Constants.FTP_LOGS_HOST+'\n\
+                user '+Constants.FTP_LOGS_USER+' '+Constants.FTP_LOGS_PASS+'\n\
+                lcd /var/www/html/GnPyPlayer\n\
+                mirror -R --continue --verbose /var/www/html/gncontent/logs/log_view /log_view\n\
+                bye\n\
+                "'
+            os.system(cmd)
             
-            # Aguarda 1 hora até a próxima sincronia
+            # Sincroniza os logs a cada 1 hora
             time.sleep(3600)
