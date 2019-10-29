@@ -53,13 +53,25 @@ class Sync:
             except:
                 print("Erro ao baixar o arquivo de dados");
             if response and response.data != "":
-                #Grava o arquivo local
-                objFile = open(fileData, 'w');
+                
+                # Valida o conteúdo                
                 respData = str(response.data);
                 jsonContent = respData[2:-1];
                 jsonContent = jsonContent.replace("\\\\", "\\");
-                objFile.write(jsonContent);
-                objFile.close();
+                contentValid = False
+                try:
+                    checkJson = json.loads(jsonContent);
+                    contentValid = True
+                except:
+                    pass
+                
+                if contentValid == True:
+                    # Grava o arquivo
+                    objFile = open(fileData, 'w');
+                    objFile.write(jsonContent);
+                    objFile.close();
+                
+                
                 print("Arquivo de dados atualizado");
 
             #Realiza a leitura do arquivo json
