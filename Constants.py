@@ -31,7 +31,7 @@ FTP_LOGS_PASS = 'gnlogs1515';
 FTP_CONTENT_HOST = FTP_JS_HOST;
 FTP_CONTENT_USER = 'gnsignage';
 FTP_CONTENT_PASS = 'gnsignage1515';
-COMMAND_START_PLAYER = "chromium-browser --enable-logging --v=1 --kiosk --app=http://localhost/jsplayer/index-linux.html"
+COMMAND_START_PLAYER = "chromium-browser --autoplay-policy=no-user-gesture-required --disable-features=PreloadMediaEngagementData,MediaEngagementBypassAutoplayPolicies --kiosk --app=http://localhost/jsplayer/index-linux.html"
 #COMMAND_START_PLAYER = "chromium-browser --enable-logging --v=1 http://localhost/jsplayer/index-linux.html"
 TIME_PLAYER_ON = ""
 TIME_PLAYER_OFF = ""

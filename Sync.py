@@ -152,9 +152,9 @@ class Sync:
         
         #Arquivos
         if media['arquivo'][-1:] != "/":
-            
-            #Executa o download
-            util.syncFileHttp(mediaSrc, mediaDst, int(media["tamanho"]), media["dt_modificacao"])
+            if "tamanho" in media:
+                #Executa o download
+                util.syncFileHttp(mediaSrc, mediaDst, int(media["tamanho"]), media["dt_modificacao"])
             
         #Pastas
         else:
