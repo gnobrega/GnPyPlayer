@@ -20,7 +20,10 @@ mkdir /var/www/html/jsplayer
 chmod -R 777 /var/www/html/
 
 lftp -f "
-open gnsignage.gnwebsites.com.br
+set ftp:ssl-allow false
+set ftp:use-feat false
+set net:timeout 60
+open ds.gnplay.com.br
 user gnpyplayer gnpyplayer1515
 lcd /var/www/html/GnPyPlayer
 mirror --continue --delete --verbose / /var/www/html/GnPyPlayer

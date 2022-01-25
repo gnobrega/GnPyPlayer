@@ -66,7 +66,8 @@ class Watch:
                 #Verifica se o player está em execução
                 import Socket
                 print("Tempo de ociosidade: " + str(Socket.lastPing) + "s")
-                if Socket.lastPing > 240 or Watch.firstAccess == True:
+                #if Socket.lastPing > 240 or Watch.firstAccess == True:
+                if Watch.firstAccess == True:
                     threading.Thread(target=util.startPlayer).start()
 
                 Watch.firstAccess = False

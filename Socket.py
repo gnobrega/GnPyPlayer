@@ -1,8 +1,7 @@
-import socketio
-import eventlet
-import eventlet.wsgi
+from websocket_server import WebsocketServer
+import json
 import Util
-from flask import Flask, render_template
+
 util = Util.Util();
 lastPing = 0
 clientConnected = False
@@ -10,59 +9,52 @@ clientOfflineTime = 0
 startCountTimeOffline = False
 
 def start():
-
-    sio = socketio.Server()
-    app = Flask(__name__)
-
-    @sio.on('connect')
-    def connect(sid, environ):
+    
+    # Called for every client connecting (after handshake)
+    def new_client(client, server):
         import Socket
+        print("[SOCKET] Cliente conectado id %d" % client['id'])
+        #server.send_message_to_all("Hey all, a new client has joined us")
         Socket.clientConnected = True
         Socket.startCountTimeOffline = True
-        print("SocketIo: Connect ", sid)
-        
-    @sio.on('disconnect')
-    def disconnect(sid):
+
+
+    # Called for every client disconnecting
+    def client_left(client, server):
         import Socket
         Socket.clientConnected = False
-        print("SocketIo: Disconnect ", sid)
+        print("Client(%d) disconnected" % client['id'])
 
-    @sio.on('keep-opened')
-    def keepOpened(sid, data):
-        #socket.emit("chat message", {a:123})
-        #sio.emit('reply', room=sid)
-        #sio.emit('message', data='abc')
 
-        print("SocketIo: received command, keep-opened");
-        util.setPreferences("keep-opened", str(data['status']))
-
-    @sio.on('send-ping')
-    def sendPing(sid, data):
-        import Socket
-        Socket.lastPing = 0
+    # Called when a client sends a message
+    def message_received(client, server, message):
+        print("Client(%d) said: %s" % (client['id'], message))
         
-    #Recebe comando do JavaScript
-    @sio.on('call-app')
-    def callApp(sid, data):
-        if "action" in data:
-            if data['action'] == "log-view":
-                if "data" in data:
-                    util.logView(data['data'])
+        objJson = json.loads(message);
+        if 'command' in objJson:
+            
+            #Ping
+            if objJson['command'] == 'send-ping':
+                import Socket
+                Socket.lastPing = 0
+                #print('[SOCKET] Ping received')
+                
+            #LogView
+            if objJson['command'] == 'log-view':
+            	if "data" in objJson:
+            		util.logView(objJson['data'])
 
-    @sio.on('get-info')
-    def getInfo(sid, data):
-        sio.emit('get-info-response', {'keep-opened':util.getPreferences("keep-opened")})
-
-    #Incrementa o registro de ociosidade
+    # Incrementa o registro de ociosidade
     import threading
-    threading.Thread(target=increaseLastPing).start()
+    threading.Thread(target=increaseLastPing).start()	
 
-    #START
-    # wrap Flask application with engineio's middleware
-    app = socketio.Middleware(sio, app)
-
-    # deploy as an eventlet WSGI server
-    eventlet.wsgi.server(eventlet.listen(('', 8000)), app)
+    # Ini socket server
+    PORT=8000
+    server = WebsocketServer(PORT)
+    server.set_fn_new_client(new_client)
+    server.set_fn_client_left(client_left)
+    server.set_fn_message_received(message_received)
+    server.run_forever()
 
 #Incrementa o valor do ping
 def increaseLastPing():
@@ -75,7 +67,6 @@ def increaseLastPing():
     while True:
         Socket.lastPing += 5
         time.sleep(5)
-        
         try:
         
             #Inicia a verificação de conectividade com o Socket
@@ -83,7 +74,7 @@ def increaseLastPing():
                 if Socket.clientConnected == False:
                     Socket.clientOfflineTime += 5
                     if Socket.clientOfflineTime > 5:
-                        print("Socket: O clinte perdeu a comunicação com o SocketIO")
+                        print("[SOCKET] O clinte perdeu a comunicação com o Socket")
                         Socket.startCountTimeOffline = False
                         Socket.clientOfflineTime = 0
                         util.closeApp();
@@ -91,4 +82,4 @@ def increaseLastPing():
                         threading.Thread(target=util.startPlayer).start()
                         
         except Exception as e:
-            print("Exception no monitoramento do Socket");
+            print("(X) Exception no monitoramento do Socket");
