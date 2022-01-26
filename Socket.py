@@ -1,6 +1,7 @@
 from websocket_server import WebsocketServer
 import json
 import Util
+import logging
 
 util = Util.Util();
 lastPing = 0
@@ -49,8 +50,7 @@ def start():
     threading.Thread(target=increaseLastPing).start()	
 
     # Ini socket server
-    PORT=8000
-    server = WebsocketServer(PORT)
+    server = WebsocketServer(host='127.0.0.1', port=8000, loglevel=logging.INFO)
     server.set_fn_new_client(new_client)
     server.set_fn_client_left(client_left)
     server.set_fn_message_received(message_received)

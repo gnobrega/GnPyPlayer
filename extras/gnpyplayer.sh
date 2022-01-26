@@ -43,6 +43,7 @@ pip3 install flask
 pip3 install pyautogui
 pip3 install Xlib
 pip3 install netifaces
+pip3 install websocket-server
 
 #Instala o browser
 apt-get -y install chromium-browser
