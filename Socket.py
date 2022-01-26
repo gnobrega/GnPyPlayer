@@ -28,7 +28,7 @@ def start():
 
     # Called when a client sends a message
     def message_received(client, server, message):
-        print("Client(%d) said: %s" % (client['id'], message))
+        #print("Client(%d) said: %s" % (client['id'], message))
         
         objJson = json.loads(message);
         if 'command' in objJson:
